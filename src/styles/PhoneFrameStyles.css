@@ -1,0 +1,51 @@
+/* Estilos generales */
+* {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    backface-visibility: hidden !important;
+}
+  
+/* Estilo para el contenedor que simula el teléfono */
+.preview-wrap {
+    width: 186px;  /* la mitad de 352px */
+    height: 362px;  /* la mitad de 724px */
+    position: relative;
+    top: 50%;  /* Ajusta esto para centrar */
+    left: 50%;  /* Ajusta esto para centrar */
+    transform: translate(-50%, -50%);  /* Centra el elemento */
+    border-radius: 32px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 12px 24px rgba(0, 0, 0, 0.2);
+    border: 6px solid #333;
+    overflow: hidden;
+}
+
+.preview-wrap::before {
+    content: "";
+    display: block;
+    width: 40px;  /* tamaño reducido */
+    height: 5px;  /* tamaño reducido */
+    background-color: #333;  /* o el color que quieras */
+    position: absolute;
+    top: 5px;  /* posición ajustada */
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2.5px;  /* bordes redondeados */
+}
+  
+/* Estilo para el elemento interior del contenedor */
+.sc-hoXqvr.kTgJcS iframe {
+    height: 100%;
+    width: 100%;
+    border: none; /* Eliminar el borde */
+}
+  
+/* Estilo para el fondo del teléfono */
+.preview-wrap:after {
+    content: "";
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
