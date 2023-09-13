@@ -32,15 +32,16 @@ export const QrCodeComponent: React.FC<QrCodeComponentProps> = ({ businessName }
   const qrCodeUrl = `http://localhost:3000/${safeBusinessName}`;
 
   return (
-    <div>
-      <p className="text-lg mr-2" style={{ color: 'black', fontSize: '1.25rem', fontWeight: 'bold' }}>
+    <div className="flex items-center justify-between" style={{ minWidth: '200px' }}>
+      <p className="text-lg mr-2 truncate" style={{ color: 'black', fontSize: '1.25rem', fontWeight: 'bold', maxWidth: '165px' }}>
         @{businessName}
       </p>
-      <Image src={qrCodeUrl}  width="100"
-            height="100"
-            layout="responsive" alt="QR Code" style={{ width: 35, height: 35 }} />
+      <div className="flex-shrink-0">
+        <Image src={qrCodeUrl}  width={35} height={35} alt="QR Code" className="mx-auto" />
+      </div>
     </div>
   );
 };
+
 
 export default QrCodeComponent;

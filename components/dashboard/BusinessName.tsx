@@ -52,15 +52,16 @@ const NombreDelNegocio: React.FC<NombreDelNegocioProps> = ({ businessName, onBus
         Nombre del Negocio:
       </label>
       <input 
-        type="text" 
-        id="businessName"  
-        name="businessName" 
-        style={{ textTransform: 'capitalize' }}
-        value={inputValue}
-        onChange={handleChange}
-        maxLength={27}
-        className={`block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:border sm:text-sm ${isNameAvailable === false ? 'border-red-600' : isNameAvailable === true ? 'border-green-600' : 'border-gray-300'}`}
-      />
+  type="text" 
+  id="businessName"  
+  name="businessName" 
+  style={{ textTransform: 'capitalize' }}
+  value={inputValue}
+  onChange={handleChange}
+  maxLength={15}  // Cambiado a 15
+  className={`block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:border sm:text-sm ${isNameAvailable === false ? 'border-red-600' : isNameAvailable === true ? 'border-green-600' : 'border-gray-300'}`}
+/>
+
       {isNameAvailable === false && <p className="text-red-600">Este nombre ya está en uso.</p>}
       {isNameAvailable === true && <p className="text-green-600">Este nombre está disponible.</p>}
     </div>

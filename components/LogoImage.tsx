@@ -2,16 +2,18 @@
 import Image from 'next/image';
 
 const LogoImage = () => {
-  return (
-    <Image
-      className="mx-auto h-14 w-14"
-      src="/logo.png"
-      alt="Your Company"
-      width={62}
-      height={55}
-      layout="responsive"
-    />
-  );
-};
-
-export default LogoImage;
+    return (
+      <div className="mx-auto w-10">
+        <Image
+          src="/logo.png"
+          alt="Your Company"
+          width={42}
+          height={55}
+          layout="intrinsic"
+        />
+      </div>
+    );
+  };
+  
+  export default LogoImage;
+  
