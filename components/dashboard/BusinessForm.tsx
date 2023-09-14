@@ -60,7 +60,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
     const [isFormComplete, setIsFormComplete] = useState(false);
 
     useEffect(() => {
-   
+       
         setIsFormComplete(
           businessName !== "" && 
           businessType !== "" && 
@@ -113,8 +113,8 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
             />
            <TipoDeNegocio 
             setBusinessTypes={setBusinessTypes} 
-            selectedValue={selectedBusinessType} 
-            onChange={(newValue: string) => setSelectedBusinessType(newValue)}
+            selectedValue={businessType} 
+            onChange={(newValue: string) => setBusinessType(newValue)}
         />
             {isGoogleApiLoaded && <CampoDeDireccion onChange={(newValue: string) => setAddress(newValue)}/>}
             <AcceptMaxFiles 
@@ -122,13 +122,14 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
                 onFileUpload={(file) => setLogo(file)}
                 logo={logo}
             />
-            <button 
-                type="submit" 
-                className="px-4 py-2 bg-blue-500 text-white rounded" 
-                disabled={!isFormComplete}
-            >
-                Continuar
-            </button>
+        <button 
+    type="submit" 
+    className={`px-4 py-2 rounded font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isFormComplete ? 'bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600' : 'bg-indigo-500 hover:bg-indigo-400 focus-visible:outline-indigo-500'}`} 
+    disabled={!isFormComplete}
+>
+    Continuar
+</button>
+
         </form>
     );
 };
