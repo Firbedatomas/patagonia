@@ -22,7 +22,6 @@ const NombreDelNegocio: React.FC<NombreDelNegocioProps> = ({ businessName, onBus
         setIsNameAvailable(response.data.isAvailable);
       } catch (error) {
         if (axios.isCancel(error)) {
-          console.log('Request canceled', error.message);
         } else {
           console.error('Error al verificar la disponibilidad del nombre', error);
         }

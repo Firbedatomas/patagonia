@@ -1,4 +1,3 @@
-// db/models/Business.tsx
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../db/database');
 

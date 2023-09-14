@@ -6,11 +6,8 @@ const checkBusinessName = async (req, res) => {
     
         // Normalizamos a minúsculas
         name = name.toLowerCase();
-    
-
     try {
         const business = await Business.findOne({ where: { businessName: name } });
-      
       if (business) {
         return res.status(200).json({ isAvailable: false });
       } else {

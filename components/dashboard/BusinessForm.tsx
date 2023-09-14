@@ -54,18 +54,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
     const [isGoogleApiLoaded] = useState(true);
     const [businessType, setBusinessType] = useState("");
     const [address, setAddress] = useState("");
-    const [logo, setLogo] = useState<File | null>(null); // Aquí está el cambio
+    const [logo, setLogo] = useState<File | null>(null);
     const { isNameAvailable, error } = useNameAvailability(businessName);
 
     const [isFormComplete, setIsFormComplete] = useState(false);
 
     useEffect(() => {
-        console.log('businessName:', businessName);
-        console.log('businessType:', businessType);
-        console.log('address:', address);
-        console.log('logo:', logo);
-        console.log('isNameAvailable:', isNameAvailable);
-    
+   
         setIsFormComplete(
           businessName !== "" && 
           businessType !== "" && 
@@ -85,24 +80,48 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
         }
     };
 
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        
+        let imageSrc = null;
+        if (previewImages.length > 0) {
+            imageSrc = previewImages[0];
+        }
+
+        const response = await fetch('/api/createBusiness', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId,
+                businessName,
+                businessType,
+                address,
+                imageSrc,
+            }),
+        });
+
+        const data = await response.json();
+    };
+
     return (
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
             <NombreDelNegocio 
                 businessName={businessName} 
                 onBusinessNameChange={onBusinessNameChange}
             />
-            <TipoDeNegocio 
-                setBusinessTypes={setBusinessTypes} 
-                selectedValue={selectedBusinessType} 
-                onChange={(newValue: string) => setBusinessType(newValue)}
-            />
+           <TipoDeNegocio 
+            setBusinessTypes={setBusinessTypes} 
+            selectedValue={selectedBusinessType} 
+            onChange={(newValue: string) => setSelectedBusinessType(newValue)}
+        />
             {isGoogleApiLoaded && <CampoDeDireccion onChange={(newValue: string) => setAddress(newValue)}/>}
             <AcceptMaxFiles 
                 onPreviewAvailable={handlePreviewAvailable} 
                 onFileUpload={(file) => setLogo(file)}
-                logo={logo}  // Aquí estás pasando la propiedad logo
+                logo={logo}
             />
-
             <button 
                 type="submit" 
                 className="px-4 py-2 bg-blue-500 text-white rounded" 
