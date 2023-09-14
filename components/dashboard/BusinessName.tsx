@@ -62,8 +62,9 @@ const NombreDelNegocio: React.FC<NombreDelNegocioProps> = ({ businessName, onBus
   className={`block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:border sm:text-sm ${isNameAvailable === false ? 'border-red-600' : isNameAvailable === true ? 'border-green-600' : 'border-gray-300'}`}
 />
 
-      {isNameAvailable === false && <p className="text-red-600">Este nombre ya está en uso.</p>}
-      {isNameAvailable === true && <p className="text-green-600">Este nombre está disponible.</p>}
+{isNameAvailable === true && <p className="text-green-600">Este nombre está disponible.</p>}
+{isNameAvailable === false && <p className="text-red-600">Este nombre no está disponible.</p>}
+
     </div>
   );
 };

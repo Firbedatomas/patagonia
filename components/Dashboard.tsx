@@ -5,7 +5,6 @@ import VerificationAlert from './VerificationAlert';
 import LoadingSpinner from './LoadingSpinner';
 import { isVerified } from './isVerified';
 import PhonePreview from './dashboard/PhonePreview';
-import { getMenuPreviewContent } from './dashboard/MenuPreview';
 
 export default function Dashboard() {
     
@@ -20,6 +19,7 @@ export default function Dashboard() {
 
     const handleHeaderImageChange = useCallback((newHeaderImage: string | null) => {
         setHeaderImage(newHeaderImage);
+   
     }, []);
 
     return (

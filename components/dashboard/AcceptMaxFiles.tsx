@@ -8,22 +8,29 @@ const DropzoneArea = styled.div`
 
 interface AcceptMaxFilesProps {
   onPreviewAvailable: (isAvailable: boolean, previewImages: string[]) => void;
+  onFileUpload: (file: File | null) => void; // Asegúrate de que esta prop está siendo pasada correctamente
+  logo: File | null; // Añade esta prop para representar el archivo de logo actual
 }
 
-const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onPreviewAvailable }) => {
+const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onPreviewAvailable, onFileUpload, logo }) => {
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({ maxFiles: 1 });
 
   useEffect(() => {
     onPreviewAvailable(previewImages.length > 0, previewImages);
-  }, [previewImages, onPreviewAvailable]);  // Añadido onPreviewAvailable aquí
-  
+  }, [previewImages, onPreviewAvailable]);
 
   useEffect(() => {
+    if (acceptedFiles.length > 0 && (logo === null || logo.name !== acceptedFiles[0].name)) {
+        onFileUpload(acceptedFiles[0]);
+    }
+}, [acceptedFiles, onFileUpload, logo]);
+useEffect(() => {
     const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'));
     const imagePreviews = imageFiles.map(file => URL.createObjectURL(file));
     setPreviewImages(imagePreviews);
-  }, [acceptedFiles]);
+}, [acceptedFiles]);
+
 
   const acceptedFileItems = acceptedFiles.map(file => (
     <li key={file.name}>

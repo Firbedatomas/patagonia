@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { LoadScript, StandaloneSearchBox } from '@react-google-maps/api';
-
-const CampoDeDireccion: React.FC = () => {
+interface CampoDeDireccionProps {
+  onChange: (newValue: string) => void; 
+}
+const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange }) => {
+ 
   const [isGoogleApiLoaded, setGoogleApiLoaded] = useState(false);
   const [address, setAddress] = useState("");
   const googleMapApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY || "";
@@ -29,6 +32,8 @@ const CampoDeDireccion: React.FC = () => {
               const place = ref.getPlaces()?.[0];
               if (place && place.formatted_address) {
                 setAddress(place.formatted_address);
+                onChange(place.formatted_address); // Añade esta línea para actualizar el estado en BusinessForm
+
               }
             })}
           >
