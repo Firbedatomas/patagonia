@@ -35,6 +35,7 @@ export default NextAuth({
     async jwt({ token, user }) {
       // Agregar campos al token aquí
       if (user) {
+        token.id = user.id;  
         token.businessName = user.businessName;
         token.fullName = user.fullName;
         token.timezone = user.timezone;
@@ -47,7 +48,7 @@ export default NextAuth({
       // Casting explícito
       const typedSession: any = session;
       const typedToken: any = token;
-    
+      typedSession.user.id = typedToken.id;
       typedSession.user.businessName = typedToken.businessName;
       typedSession.user.fullName = typedToken.fullName;
       typedSession.user.timezone = typedToken.timezone;

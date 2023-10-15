@@ -57,7 +57,7 @@ const NombreDelNegocio: React.FC<NombreDelNegocioProps> = ({ businessName, onBus
   style={{ textTransform: 'capitalize' }}
   value={inputValue}
   onChange={handleChange}
-  maxLength={15}  // Cambiado a 15
+  maxLength={15}  
   className={`block w-full px-4 py-2 border rounded-md shadow-sm focus:ring focus:border sm:text-sm ${isNameAvailable === false ? 'border-red-600' : isNameAvailable === true ? 'border-green-600' : 'border-gray-300'}`}
 />
 

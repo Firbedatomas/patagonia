@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { LoadScript, StandaloneSearchBox, Libraries } from '@react-google-maps/api';
 
-
-
 interface CampoDeDireccionProps {
   onChange: (newValue: string) => void; 
+  isGoogleMapLoaded: boolean;  // Nueva prop
 }
-
  
-const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange }) => {
+const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange, isGoogleMapLoaded }) => {
+  
 
   const [isGoogleApiLoaded, setGoogleApiLoaded] = useState(false);
   const [address, setAddress] = useState("");
@@ -24,7 +23,7 @@ const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange }) => {
   }, [googleMapApiKey]);
 
   return (
-    isGoogleApiLoaded && (
+    isGoogleMapLoaded && (  // Utilizando la nueva prop
       <div className="relative">
         <label htmlFor="address" className="block text-sm font-medium text-gray-600">
           Dirección:

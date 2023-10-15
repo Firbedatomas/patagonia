@@ -6,11 +6,16 @@ import AcceptMaxFiles from './AcceptMaxFiles';
 import axios from 'axios';
 
 interface BusinessFormProps {
-    userId: string;
-    businessName: string;
-    onBusinessNameChange: (newName: string) => void;
-    onHeaderImageChange: (newImage: string | null) => void;
+  userId: string | null;
+  businessName: string;
+  onBusinessNameChange: (newName: string) => void;
+  onHeaderImageChange: (newImage: string | null) => void;
+  setCurrentStep: (step: string) => void;
+  updateStepStatus: (newCurrentStep: string) => void;  // Asegúrate de que este tipo esté correcto
+  isGoogleMapLoaded: boolean;  // Nueva prop
 }
+
+  
 
 interface TipoDeNegocioProps {
     setBusinessTypes: (types: string[]) => void;
@@ -45,8 +50,9 @@ const useNameAvailability = (businessName: string) => {
     return { isNameAvailable, error };
 };
 
-const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBusinessNameChange, onHeaderImageChange }) => {
-    
+  const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBusinessNameChange, onHeaderImageChange, setCurrentStep, updateStepStatus, isGoogleMapLoaded }) => {
+
+ 
     const [isPreviewAvailable, setPreviewAvailable] = useState(false);
     const [previewImages, setPreviewImages] = useState<string[]>([]);
     const [businessTypes, setBusinessTypes] = useState<string[]>([]);
@@ -82,28 +88,55 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        
-        let imageSrc = null;
-        if (previewImages.length > 0) {
-            imageSrc = previewImages[0];
+    
+        if (userId) {
+          try {
+            let imageSrc = null;
+            if (previewImages.length > 0) {
+                imageSrc = previewImages[0];
+            }
+    
+            // Aquí es donde creas un objeto FormData y agregas tus datos a él
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('businessName', businessName);
+            formData.append('businessType', businessType);
+            formData.append('address', address);
+            if (logo) {
+              formData.append('logo', logo);
+            }
+            if (imageSrc) {
+              formData.append('imageSrc', imageSrc);
+            }
+    
+            // Y luego envías ese objeto FormData en tu solicitud POST
+            const response = await axios.post('/api/createBusiness', formData);
+    
+            if (response.status === 200) {
+              // Aquí, asumimos que una respuesta con estado 200 significa éxito
+              console.log("Negocio creado exitosamente:", response.data);
+              setCurrentStep('02');
+              updateStepStatus('02');  // Actualizar el estado del paso aquí
+              // Puedes redirigir al usuario o mostrar un mensaje de éxito aquí
+            } else {
+              // Puedes añadir aquí manejo para otros códigos de estado que consideres como éxito
+              console.error("Respuesta inesperada del servidor:", response);
+            }
+          } catch (error) {
+            if (axios.isAxiosError(error)) {
+              // Aquí puedes manejar errores específicos de Axios
+              console.error("Error de Axios:", error.response?.data);
+            } else {
+              // Aquí manejarías otros tipos de errores (no Axios)
+              console.error("Error inesperado:", error);
+            }
+          }
+ 
+        } else {
+          console.error('userId no está definido');
         }
-
-        const response = await fetch('/api/createBusiness', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId,
-                businessName,
-                businessType,
-                address,
-                imageSrc,
-            }),
-        });
-
-        const data = await response.json();
     };
+    
 
     return (
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -116,7 +149,8 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ userId, businessName, onBus
             selectedValue={businessType} 
             onChange={(newValue: string) => setBusinessType(newValue)}
         />
-            {isGoogleApiLoaded && <CampoDeDireccion onChange={(newValue: string) => setAddress(newValue)}/>}
+          {isGoogleApiLoaded && <CampoDeDireccion onChange={(newValue: string) => setAddress(newValue)} isGoogleMapLoaded={isGoogleMapLoaded} />}
+
             <AcceptMaxFiles 
                 onPreviewAvailable={handlePreviewAvailable} 
                 onFileUpload={(file) => setLogo(file)}

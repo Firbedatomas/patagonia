@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { signIn } from 'next-auth/react';
 import moment from 'moment-timezone';
 import LogoImage from './LogoImage';
+
 export default function Registro() {
   const [businessName, setBusinessName] = useState('');
   const [fullName, setFullName] = useState('');

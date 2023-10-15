@@ -7,6 +7,7 @@ interface MenuPreviewProps {
   }
   
   export async function getMenuPreviewContent(imageSrc?: string | null, businessName?: string): Promise<string> {
+    
     const safeBusinessName = businessName ? generateSafeBusinessName(businessName) : '';
     const qrCodeUrl = businessName ? await generateQRCodeAsDataURL(businessName) : '';
     
@@ -18,7 +19,7 @@ interface MenuPreviewProps {
       <body class="flex flex-col min-h-screen p-0">
         <header class="bg-gradient-to-r from-purple-600 to-cyan-400 p-4 flex items-center justify-center shadow-md">
           <div class="text-center">
-            ${imageSrc ? `<img src="${imageSrc}" alt="Logo de la empresa" class="w-auto h-11 mx-auto" />` : '<div class="text-gray-500 font-bold text-xl">Logo</div>'}
+            ${imageSrc ? `<img src="${imageSrc}" alt="Logo de la empresa" class="w-auto h-4 mx-auto" />` : '<div class="text-gray-500 font-bold text-xl">Logo</div>'}
           </div>
         </header>
         <main class="shadow-md rounded-md p-4 flex flex-col items-center justify-center">

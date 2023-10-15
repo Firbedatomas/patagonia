@@ -4,7 +4,9 @@ import { getMenuPreviewContent } from './MenuPreview';
 interface PhonePreviewProps {
   imageSrc?: string | null;
   businessName?: string;
+  logo?: string | null;  // Añadir esta línea
 }
+
 
 const PhonePreview: FC<PhonePreviewProps> = ({ imageSrc, businessName }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
