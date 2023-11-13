@@ -1,0 +1,13 @@
+.phone-preview {
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 20px;
+    width: 300px;
+    margin-top: 20px;
+  }
+  
+  .menu-section {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+  }
+  

@@ -17,7 +17,10 @@ const register = async (req: NextApiRequest, res: NextApiResponse) => {
       [Op.or]: [{ email }],
     },
   });
-
+  // Verificar si los valores son nulos o indefinidos
+if (!timezone || !languagePreference) {
+  return res.status(400).json({ error: 'Los campos de zona horaria y preferencia de idioma son obligatorios' });
+}
   if (existingUser) {
     return res.status(400).json({ error: 'El correo electrónico o nombre de usuario ya están en uso' });
   }

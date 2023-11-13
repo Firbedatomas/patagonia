@@ -4,7 +4,11 @@ const nextConfig = {
   images: {
     domains: ['randomuser.me', 'tailwindui.com'],
     formats: ['image/avif', 'image/webp'],
-    dangerouslyAllowSVG: true,  // Añade esta línea
+    dangerouslyAllowSVG: true,
+  },
+  api: {
+    bodyParser: false,  // Desactiva el análisis automático del cuerpo de la solicitud
+    multipart: true,    // Permite la manipulación de datos de formulario multipart
   },
 }
 

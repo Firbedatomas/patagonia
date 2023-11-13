@@ -4,7 +4,6 @@ async function getBusinessByUserId(req, res) {
   const { userId } = req.query; // Obtén el userId desde la consulta
 
   try {
-    console.log("UserId recibido:", userId);
 
     const result = await sequelize.query(
       'SELECT * FROM businesses WHERE userId = :userId',
@@ -13,7 +12,6 @@ async function getBusinessByUserId(req, res) {
         type: sequelize.QueryTypes.SELECT,
       }
     );
-    console.log("Resultado de la consulta SQL:", result);
 
     if (result.length === 0) {
       return res.status(200).json({ business: null });

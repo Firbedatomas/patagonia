@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import React, { useEffect, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import styled from 'styled-components';
 
 const DropzoneArea = styled.div`
@@ -7,48 +7,37 @@ const DropzoneArea = styled.div`
 `;
 
 interface AcceptMaxFilesProps {
+  onFileUpload: (file: File | null) => void;
+  logo: File | null;
   onPreviewAvailable: (isAvailable: boolean, previewImages: string[]) => void;
-  onFileUpload: (file: File | null) => void; // Asegúrate de que esta prop está siendo pasada correctamente
-  logo: File | null; // Añade esta prop para representar el archivo de logo actual
 }
 
-const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onPreviewAvailable, onFileUpload, logo }) => {
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
-  const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({ maxFiles: 1 });
-
-  useEffect(() => {
-    onPreviewAvailable(previewImages.length > 0, previewImages);
-  }, [previewImages, onPreviewAvailable]);
-
-  useEffect(() => {
-    if (acceptedFiles.length > 0 && (logo === null || logo.name !== acceptedFiles[0].name)) {
-        onFileUpload(acceptedFiles[0]);
+const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onFileUpload, logo, onPreviewAvailable }) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => { // Tipo explícito aquí
+    if (acceptedFiles.length === 0) {
+      return;
     }
-}, [acceptedFiles, onFileUpload, logo]);
-useEffect(() => {
-    const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'));
-    const imagePreviews = imageFiles.map(file => URL.createObjectURL(file));
-    setPreviewImages(imagePreviews);
-}, [acceptedFiles]);
+    const file = acceptedFiles[0];
+    onFileUpload(file);
+    const objectURL = URL.createObjectURL(file);
+    onPreviewAvailable(true, [objectURL]);
+  }, [onFileUpload, onPreviewAvailable]);
 
+  const { getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    accept: { 'image/jpeg': ['.jpeg', '.jpg'], 'image/png': ['.png'] },
+    onDrop
+  });
 
-  const acceptedFileItems = acceptedFiles.map(file => (
-    <li key={file.name}>
-      {file.name} - {file.size} bytes
-    </li>
-  ));
-
-  const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-    <li key={file.name}>
-      {file.name} - {file.size} bytes
-      <ul>
-        {errors.map(e => <li key={e.code}>{e.message}</li>)}
-      </ul>
-    </li>
-  )); 
+  useEffect(() => {
+    if (logo) {
+      const objectURL = URL.createObjectURL(logo);
+      onPreviewAvailable(true, [objectURL]);
+    }
+  }, [logo, onPreviewAvailable]);
 
   return (
-    <section className="container">
+    <section className="container mt-4">
       <DropzoneArea {...getRootProps({ className: "dropzone-area" })}>
         <input {...getInputProps()} />
         <div className="border-4 border-dashed border-indigo-200 rounded-lg transition-all hover:border-indigo-500 hover:bg-indigo-100 p-6 text-center cursor-pointer hover:shadow-lg">
@@ -60,11 +49,8 @@ useEffect(() => {
           </p>
         </div>
       </DropzoneArea>
-      {/* Considera mostrar estos elementos en algún lugar de tu UI */}
-      <ul>{acceptedFileItems}</ul>
-      <ul>{fileRejectionItems}</ul>
     </section>
   );
-}
+};
 
 export default AcceptMaxFiles;

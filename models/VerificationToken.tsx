@@ -1,8 +1,10 @@
-// models/VerificationToken.tsx
-
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
 
+/**
+ * VerificationToken Model
+ * Represents the token used for email verification.
+ */
 class VerificationToken extends Model {
   public id!: number;
   public userId!: number;
@@ -12,6 +14,11 @@ class VerificationToken extends Model {
 
 VerificationToken.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -30,5 +37,6 @@ VerificationToken.init(
     modelName: 'VerificationToken',
   }
 );
+
 
 export default VerificationToken;

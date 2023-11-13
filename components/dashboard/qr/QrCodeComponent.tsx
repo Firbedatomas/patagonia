@@ -1,47 +1,23 @@
-import QRCode from 'qrcode';
+import React from 'react';
 import Image from 'next/image';
-
+import { generateSafeBusinessName } from '../utils';  
 interface QrCodeComponentProps {
   businessName: string;
 }
 
-export const generateSafeBusinessName = (name: string) => {
-  return name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '_')
-    .replace(/[^\w-]/g, '')
-    .toLowerCase();
-};
-
-export const generateQRCodeAsDataURL = async (businessName: string) => {
-  const safeBusinessName = generateSafeBusinessName(businessName);
-  const qrCodeUrl = `http://localhost:3000/${safeBusinessName}`;
-
-  try {
-    const url = await QRCode.toDataURL(qrCodeUrl);
-    return url;
-  } catch (err) {
-    console.error(err);
-    return '';
-  }
-};
-
 export const QrCodeComponent: React.FC<QrCodeComponentProps> = ({ businessName }) => {
   const safeBusinessName = generateSafeBusinessName(businessName);
-  const qrCodeUrl = `http://localhost:3000/${safeBusinessName}`;
-
+  const qrCodeDataUrl = `http://localhost:3000/${safeBusinessName}`; 
   return (
-    <div className="flex items-center justify-between" style={{ minWidth: '200px' }}>
-      <p className="text-lg mr-2 truncate" style={{ color: 'black', fontSize: '1.25rem', fontWeight: 'bold', maxWidth: '165px' }}>
+    <div className="flex flex-col items-center justify-end" style={{ minWidth: '100px' }}>
+      <div className="flex-shrink-0">
+        <Image src={qrCodeDataUrl}  width={10} height={10} alt="QR Code" className="mx-auto rounded-xl" />
+      </div>
+      <p className="text-sm mr-2 truncate" style={{ color: 'black', fontSize: '0.875rem', fontWeight: 'bold', maxWidth: '165px' }}>
         @{businessName}
       </p>
-      <div className="flex-shrink-0">
-        <Image src={qrCodeUrl}  width={35} height={35} alt="QR Code" className="mx-auto" />
-      </div>
     </div>
   );
 };
-
 
 export default QrCodeComponent;

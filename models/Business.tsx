@@ -1,27 +1,46 @@
-import { DataTypes, Model } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
 
-class Business extends Model {
-  id: any;
-}
+/**
+ * Business Model
+ * Represents a business entity in the system.
+ */
+class Business extends Model {}
 
-Business.init({
-  businessId: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+Business.init(
+  {
+    businessId: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    businessName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    businessType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    logo: {
+      type: DataTypes.STRING,
+      allowNull: true,  // Permite que el logo sea nulo
+    },
+    // ...otros campos según sean necesarios
   },
-  userId: DataTypes.INTEGER,
-  businessName: DataTypes.STRING,
-  businessType: DataTypes.STRING,
-  address: DataTypes.STRING,
-  logo: DataTypes.STRING, // Asegúrate de que este campo esté configurado correctamente
-  // ...otros campos
-}, {
-  sequelize,
-  modelName: 'Business',
-  tableName: 'businesses',
-});
-
+  {
+    sequelize,
+    modelName: 'Business',
+    tableName: 'businesses',  // Mantener el nombre de la tabla
+  }
+);
 
 export default Business;

@@ -8,74 +8,82 @@ import StepNavigation from './StepNavigation';
 import PhonePreview from './dashboard/PhonePreview';
 import AddSection from './dashboard/AddSection';
 import { Session } from 'next-auth';
+import { BusinessInfo } from '@/types/types'; // Ajusta la ruta según la estructura de tu proyecto
+
+interface BusinessInfoType {
+  businessId?: string;
+  businessName?: string;
+  address?: string;
+  logo?: string;
+}
 
 export default function Dashboard() {
   const [currentStep, setCurrentStep] = useState('01');
-  const [isGoogleMapLoaded, setIsGoogleMapLoaded] = useState(false);  // Nuevo estado
-
+  const [businessInfo, setBusinessInfo] = useState<BusinessInfoType | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isGoogleMapLoaded, setIsGoogleMapLoaded] = useState(false);
+  const [businessName, setBusinessName] = useState('');
   const [steps, setSteps] = useState([
     { id: '01', name: 'Datos del negocio', description: 'Cargaremos la informacion basica.', href: '#', status: 'upcoming' },
     { id: '02', name: 'Secciones del menu', description: 'Carga las secciones de tus productos.', href: '#', status: 'upcoming' },
     { id: '03', name: 'Productos', description: 'Carguemos tus primeros productos.', href: '#', status: 'upcoming' },
   ]);
 
-  const updateStepStatus = (newCurrentStep: string) => {
-    setSteps(prevSteps => prevSteps.map(step => {
-      if (step.id === newCurrentStep) {
-        return { ...step, status: 'current' };
-      } else if (parseInt(step.id) < parseInt(newCurrentStep)) {
-        return { ...step, status: 'complete' };
-      } else {
-        return { ...step, status: 'upcoming' };
-      }
-    }));
-  };
+  const { data: session } = useSession();
 
-  const { data: session, status } = useSession();
-  const [sessionData, setSessionData] = useState<Session | null>(null);
-  const [localLogo, setLocalLogo] = useState<File | null>(null); // para el logo local
-  const [dbLogoUrl, setDbLogoUrl] = useState<string | null>(null); // para el logo de la base de datos
-  
   useEffect(() => {
     if (session) {
-      setSessionData(session);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    const fetchBusiness = async () => {
+      setBusinessName(session.user?.businessName?.toLowerCase() || '');
+      const fetchBusiness = async () => {
         try {
-          const userId = sessionData?.user?.id;
+          const userId = session.user?.id;
           const res = await fetch(`/api/getBusinessByUserId?userId=${userId}`);
           const data = await res.json();
+
           if (res.ok && data.businessId) {
-            if (data.business && data.business.logo) {
-                setDbLogoUrl(data.business.logo);
-              }
+            setBusinessInfo(data);
             setCurrentStep('02');
             updateStepStatus('02');
-            setIsGoogleMapLoaded(false);  // No cargar Google Maps
+            setIsGoogleMapLoaded(false);
           } else {
             setCurrentStep('01');
             updateStepStatus('01');
-            setIsGoogleMapLoaded(true);  // Cargar Google Maps
+            setIsGoogleMapLoaded(true);
           }
         } catch (error) {
           console.error('Error fetching business:', error);
         }
       };
-    if (sessionData) {
+
       fetchBusiness();
     }
-  }, [sessionData]);
+  }, [session]);
 
-  const isUserVerified = isVerified(sessionData);
-  const [businessName, setBusinessName] = useState((sessionData?.user?.businessName as string)?.toLowerCase() || '');
-  const [headerImage, setHeaderImage] = useState<string | null>(null);
+  const updateStepStatus = useCallback((newCurrentStep: string) => {
+    setSteps(prevSteps => prevSteps.map(step => ({
+      ...step,
+      status: step.id === newCurrentStep ? 'current' : parseInt(step.id) < parseInt(newCurrentStep) ? 'complete' : 'upcoming'
+    })));
+  }, []);
+
+  const handleFileUpload = useCallback((file: File | null) => {
+    setSelectedImage(file);
+  }, []);
+
+  const selectedImageUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
+
+  const isUserVerified = isVerified(session);
 
   const handleHeaderImageChange = useCallback((newHeaderImage: string | null) => {
-    setHeaderImage(newHeaderImage);
+    setBusinessInfo(previous => ({ ...previous, logo: newHeaderImage || undefined }));
   }, []);
+
+  const businessInfoConverted: BusinessInfo | null = businessInfo && businessInfo.businessId ? {
+    businessId: parseInt(businessInfo.businessId) || 0,
+    businessName: businessInfo.businessName || '',
+    logo: businessInfo.logo || '',
+    // Asegúrate de incluir aquí todas las propiedades adicionales requeridas por BusinessInfo
+  } : null;
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -87,34 +95,31 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-1">
               <VerificationAlert isVerified={isUserVerified} />
-              {currentStep === '01' && sessionData ? (
-                sessionData.user?.id ? (
-                  <BusinessForm
-                    userId={sessionData.user.id.toString()}
-                    businessName={businessName}
-                    onBusinessNameChange={setBusinessName}
-                    onHeaderImageChange={handleHeaderImageChange}
-                    setCurrentStep={setCurrentStep}
-                    updateStepStatus={updateStepStatus}
-                    isGoogleMapLoaded={isGoogleMapLoaded}  // Nueva prop
-                  />
-                ) : (
-                  <LoadingSpinner />
-                )
-              ) : null}
-              {currentStep === '02' && <AddSection />}
+              {currentStep === '01' && (
+                <BusinessForm
+                  userId={session?.user?.id?.toString() || ''}
+                  businessName={businessName}
+                  onBusinessNameChange={setBusinessName}
+                  onHeaderImageChange={handleHeaderImageChange}
+                  setCurrentStep={setCurrentStep}
+                  updateStepStatus={updateStepStatus}
+                  isGoogleMapLoaded={isGoogleMapLoaded} 
+                  handleFileUpload={handleFileUpload}
+                />
+              )}
+              {currentStep === '02' && businessInfoConverted && (
+                <AddSection
+                  businessId={businessInfoConverted.businessId.toString()}
+                  businessInfoProp={businessInfoConverted}
+                />
+              )}
             </div>
             <div className="md:col-span-1 relative h-[750px] space-y-8">
-              <nav className="space-y-4 h-full">
-                <div className="h-[350px]">
-                <PhonePreview 
-  imageSrc={headerImage} 
-  businessName={businessName} 
-  logo={localLogo ? URL.createObjectURL(localLogo) : dbLogoUrl}
-/>
-
-                </div>
-              </nav>
+              <PhonePreview 
+                businessName={businessInfo?.businessName || businessName} 
+                logo={selectedImageUrl || businessInfo?.logo}
+                businessInfo={businessInfo}
+              />
             </div>
           </div>
         </div>
