@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import styled from 'styled-components';
 
@@ -12,8 +12,14 @@ interface AcceptMaxFilesProps {
   onPreviewAvailable: (isAvailable: boolean, previewImages: string[]) => void;
 }
 
-const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onFileUpload, logo, onPreviewAvailable }) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => { // Tipo explícito aquí
+const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({
+  onFileUpload,
+  logo,
+  onPreviewAvailable,
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) {
       return;
     }
@@ -21,20 +27,22 @@ const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onFileUpload, logo, onP
     onFileUpload(file);
     const objectURL = URL.createObjectURL(file);
     onPreviewAvailable(true, [objectURL]);
+    setImageLoaded(true); // Marca la imagen como cargada
   }, [onFileUpload, onPreviewAvailable]);
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     accept: { 'image/jpeg': ['.jpeg', '.jpg'], 'image/png': ['.png'] },
-    onDrop
+    onDrop,
   });
 
   useEffect(() => {
-    if (logo) {
+    if (logo && !imageLoaded) { // Verifica si la imagen no se ha cargado aún
       const objectURL = URL.createObjectURL(logo);
       onPreviewAvailable(true, [objectURL]);
+      setImageLoaded(true); // Marca la imagen como cargada
     }
-  }, [logo, onPreviewAvailable]);
+  }, [logo, imageLoaded, onPreviewAvailable]);
 
   return (
     <section className="container mt-4">
@@ -42,7 +50,7 @@ const AcceptMaxFiles: React.FC<AcceptMaxFilesProps> = ({ onFileUpload, logo, onP
         <input {...getInputProps()} />
         <div className="border-4 border-dashed border-indigo-200 rounded-lg transition-all hover:border-indigo-500 hover:bg-indigo-100 p-6 text-center cursor-pointer hover:shadow-lg">
           <p className="text-indigo-500 text-2xl font-semibold mb-2 transition-all hover:text-indigo-700">
-            Arrastra el logo o haz click y subelo
+            Arrastra el logo o haz click y súbelo
           </p>
           <p className="text-gray-500">
             Formatos aceptados: jpg, png, etc.

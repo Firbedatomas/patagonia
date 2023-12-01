@@ -7,6 +7,15 @@ interface TipoDeNegocioProps {
   onChange: (newValue: string) => void;
 }
 
+
+export interface BusinessInfoType {
+  // Definición de los campos del tipo BusinessInfoType
+  businessId?: string;
+  businessName?: string;
+  address?: string;
+  logo?: string;
+}
+
 const TipoDeNegocio: React.FC<TipoDeNegocioProps> = ({ setBusinessType, selectedValue, onChange }) => {
   const [businessTypes, setBusinessTypes] = useState<string[]>([]);
   

@@ -17,6 +17,14 @@ interface BusinessInfoType {
   logo?: string;
 }
 
+// Asegúrate de que la interfaz AddSectionProps incluya currentStep
+interface AddSectionProps {
+  businessId: string;
+  businessInfoProp: BusinessInfo;
+  currentStep: string; // Agrega esta propiedad
+}
+
+
 export default function Dashboard() {
   const [currentStep, setCurrentStep] = useState('01');
   const [businessInfo, setBusinessInfo] = useState<BusinessInfoType | null>(null);
@@ -24,8 +32,8 @@ export default function Dashboard() {
   const [isGoogleMapLoaded, setIsGoogleMapLoaded] = useState(false);
   const [businessName, setBusinessName] = useState('');
   const [steps, setSteps] = useState([
-    { id: '01', name: 'Datos del negocio', description: 'Cargaremos la informacion basica.', href: '#', status: 'upcoming' },
-    { id: '02', name: 'Secciones del menu', description: 'Carga las secciones de tus productos.', href: '#', status: 'upcoming' },
+    { id: '01', name: 'Datos del negocio', description: 'Cargaremos la información básica.', href: '#', status: 'upcoming' },
+    { id: '02', name: 'Secciones del menú', description: 'Carga las secciones de tus productos.', href: '#', status: 'upcoming' },
     { id: '03', name: 'Productos', description: 'Carguemos tus primeros productos.', href: '#', status: 'upcoming' },
   ]);
 
@@ -42,7 +50,7 @@ export default function Dashboard() {
 
           if (res.ok && data.businessId) {
             setBusinessInfo(data);
-            setCurrentStep('02');
+            setCurrentStep('02'); // Cambia a '02' cuando el negocio existe
             updateStepStatus('02');
             setIsGoogleMapLoaded(false);
           } else {
@@ -107,19 +115,23 @@ export default function Dashboard() {
                   handleFileUpload={handleFileUpload}
                 />
               )}
-              {currentStep === '02' && businessInfoConverted && (
-                <AddSection
-                  businessId={businessInfoConverted.businessId.toString()}
-                  businessInfoProp={businessInfoConverted}
-                />
-              )}
+                {currentStep === '02' && businessInfoConverted && (
+                  <AddSection
+                    businessId={businessInfoConverted.businessId.toString()}
+                    businessInfoProp={businessInfoConverted}
+                  />
+                )}
+
+
+          
             </div>
-            <div className="md:col-span-1 relative h-[750px] space-y-8">
-              <PhonePreview 
-                businessName={businessInfo?.businessName || businessName} 
-                logo={selectedImageUrl || businessInfo?.logo}
-                businessInfo={businessInfo}
-              />
+            <div className="md:col-span-1 relative space-y-8">
+            <PhonePreview 
+  businessName={businessInfo?.businessName || businessName} 
+  logo={selectedImageUrl || businessInfo?.logo}
+  businessInfo={businessInfo}
+  currentStep={currentStep} // Asegúrate de pasar el paso actual aquí
+/>
             </div>
           </div>
         </div>

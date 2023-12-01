@@ -1,10 +1,7 @@
-//components/dashboard/AddSection.tsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BusinessInfo, AddSectionProps } from '@/types/types'; // Ajusta la ruta según la estructura de tu proyecto
 import MenuSectionPreview from '../MenuSectionPreview'; // Ajusta la ruta según sea necesario
-
 
 // Interfaces adicionales para los estados del formulario
 interface SectionFormState {
@@ -67,7 +64,7 @@ const AddSection: React.FC<AddSectionProps> = ({ businessId, businessInfoProp })
       )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-      <div>
+        <div>
           <label htmlFor="sectionName" className="block text-sm font-medium text-gray-700">Nombre de la Sección:</label>
           <input
             id="sectionName"
@@ -96,12 +93,6 @@ const AddSection: React.FC<AddSectionProps> = ({ businessId, businessInfoProp })
           Agregar Sección
         </button>
       </form>
-
-      {/* Vista previa de la sección del menú */}
-      <MenuSectionPreview
-  sectionName={section.sectionName}
-  description={section.description}
-/>
     </div>
   );
 };

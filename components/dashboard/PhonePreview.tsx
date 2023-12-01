@@ -1,34 +1,59 @@
-// PhonePreview.tsx
-import React, { FC, useEffect, useRef } from 'react';
-import { getMenuPreviewContent } from './MenuPreview'; 
+import React, { FC, useEffect, useRef, useState } from 'react';
+import { getMenuPreviewContent } from './MenuPreview';
 import CommonHeader from './CommonHeader';
+import { BusinessInfoType } from './BusinessType'; // Asegúrate de que la ruta sea correcta
 
-export interface BusinessInfoType {
-  businessId?: string;
-  businessName?: string;
-  address?: string;
-  logo?: string;
-}
-
-interface PhonePreviewProps {
+export interface PhonePreviewProps {
   imageSrc?: string | null;
   businessName?: string;
   logo?: string | null;
   dbLogoUrl?: string | null;
   businessInfo?: BusinessInfoType | null;
+  currentStep: string;
 }
 
-const PhonePreview: FC<PhonePreviewProps> = ({ imageSrc, businessName, logo, dbLogoUrl, businessInfo }) => {
+const PhonePreview: FC<PhonePreviewProps> = ({
+  imageSrc,
+  businessName,
+  logo,
+  dbLogoUrl,
+  businessInfo,
+  currentStep,
+}) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Simplificado a una sola línea utilizando operador de coalescencia nula.
+  const [sectionName, setSectionName] = useState<string>(''); // Estado para almacenar el valor del input
   const logoToDisplay = logo ?? businessInfo?.logo ?? dbLogoUrl ?? null;
 
   useEffect(() => {
     const updateIframeContent = async () => {
       if (iframeRef.current) {
         try {
-          const content = await getMenuPreviewContent(imageSrc, businessName, logoToDisplay);
+          let content = '';
+
+          if (currentStep === '01') {
+            // Muestra el contenido completo (incluyendo QR y nombre de la empresa) en el paso 1
+            content = await getMenuPreviewContent(imageSrc, businessName, logoToDisplay);
+          } else {
+            // Muestra solo el logo de la empresa y el nombre de la sección en otros pasos
+            content = `
+              <html>
+              <head>
+                <link href="/tailwind.css" rel="stylesheet">
+              </head>
+              <body style="display: flex; flex-direction: column; height: 100vh; justify-content: flex-start;">
+                <main class="shadow-md rounded-md p-4 flex flex-col items-center justify-center mt-auto">
+                  <div class="text-center flex flex-col items-center">
+                    <div style="position: relative; width: 100%; minHeight: 35px;">
+                      <p class="text-black font-bold text-sm mb-2">@${businessName}</p>
+                      <p class="text-black font-bold text-sm mb-2">{sectionName}</p> 
+                    </div>
+                  </div>
+                </main>
+              </body>
+              </html>
+            `;
+          }
+
           const { contentWindow } = iframeRef.current;
 
           if (contentWindow) {
@@ -45,7 +70,7 @@ const PhonePreview: FC<PhonePreviewProps> = ({ imageSrc, businessName, logo, dbL
     };
 
     updateIframeContent();
-  }, [imageSrc, businessName, logoToDisplay]);
+  }, [imageSrc, businessName, logoToDisplay, currentStep, sectionName]);
 
   return (
     <div id="React--Preview" className="preview-wrap">

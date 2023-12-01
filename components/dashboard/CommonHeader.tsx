@@ -13,8 +13,8 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({ logoToUse }) => {
       <div className="text-center">
         {logoToUse ? 
           // Utiliza etiqueta img para URLs locales
-          <div style={{ position: 'relative', width: '50px', minHeight: '35px' }}>
-          <img src={logoToUse} alt="Logo de la empresa" style={{ width: '100px', height: 'auto' }} />
+          <div style={{ position: 'relative', width: '100%', minHeight: '35px' }}>
+          <img src={logoToUse} alt="Logo de la empresa" style={{ width: '60px', height: 'auto' }} />
           </div> 
 
           : 

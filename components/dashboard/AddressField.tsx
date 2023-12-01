@@ -5,6 +5,7 @@ interface CampoDeDireccionProps {
   onChange: (newValue: string) => void; 
   isGoogleMapLoaded: boolean;  // Nueva prop
 }
+const libraries: Libraries = ['places'];
  
 const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange, isGoogleMapLoaded }) => {
   
@@ -12,7 +13,6 @@ const CampoDeDireccion: React.FC<CampoDeDireccionProps> = ({ onChange, isGoogleM
   const [isGoogleApiLoaded, setGoogleApiLoaded] = useState(false);
   const [address, setAddress] = useState("");
   const googleMapApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY || "";
-  const libraries: Libraries = ['places'];
 
   useEffect(() => {
     if (googleMapApiKey) {

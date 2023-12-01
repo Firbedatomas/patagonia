@@ -5,6 +5,7 @@ import TipoDeNegocio from './BusinessType';
 import CampoDeDireccion from './AddressField';
 import AcceptMaxFiles from './AcceptMaxFiles';
 import axios from 'axios';
+import Link from 'next/link';
 
 interface BusinessFormProps {
   userId: string | null;
@@ -89,6 +90,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
       if (response.status === 200) {
         setCurrentStep('02');
         updateStepStatus('02');
+        window.location.reload();
       } else {
         setError("Respuesta inesperada del servidor");
       }
@@ -109,7 +111,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
       <AcceptMaxFiles onFileUpload={handleFileUpload} logo={logo} onPreviewAvailable={handlePreviewAvailable} />
       <button 
         type="submit" 
-        className={`px-4 py-2 rounded font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isFormComplete ? 'bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600' : 'bg-indigo-500 hover:bg-indigo-400 focus-visible:outline-indigo-500'}`} 
+        className={`px-4 py-2 mt-4 rounded font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isFormComplete ? 'bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600' : 'bg-indigo-500 hover:bg-indigo-400 focus-visible:outline-indigo-500'}`} 
         disabled={!isFormComplete}
       >
         Continuar

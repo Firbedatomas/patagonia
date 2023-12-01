@@ -19,7 +19,6 @@ export async function getMenuPreviewContent(imageSrc?: string | null, businessNa
       <link href="/tailwind.css" rel="stylesheet">
     </head>
     <body style="display: flex; flex-direction: column; height: 100vh; justify-content: flex-start;">
-      <!-- Aquí deberías renderizar CommonHeader, pero como es un componente React, no se puede usar directamente en este contexto -->
       <main class="shadow-md rounded-md p-4 flex flex-col items-center justify-center mt-auto">
         <div class="text-center flex flex-col items-center">
           ${qrCodeContent}
