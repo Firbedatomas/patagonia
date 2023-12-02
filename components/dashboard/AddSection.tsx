@@ -1,56 +1,52 @@
+// AddSection.tsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BusinessInfo, AddSectionProps } from '@/types/types'; // Ajusta la ruta según la estructura de tu proyecto
-import MenuSectionPreview from '../MenuSectionPreview'; // Ajusta la ruta según sea necesario
+import { BusinessInfo, AddSectionProps } from '@/types/types';
 
-// Interfaces adicionales para los estados del formulario
 interface SectionFormState {
   sectionName: string;
   description: string;
 }
 
-// Componente principal
-const AddSection: React.FC<AddSectionProps> = ({ businessId, businessInfoProp }) => {
+const AddSection: React.FC<AddSectionProps> = ({ businessId, businessInfoProp, onSectionNameChange }) => {
   const [businessInfo, setBusinessInfo] = useState<BusinessInfo | null>(null);
   const [section, setSection] = useState<SectionFormState>({ sectionName: '', description: '' });
 
-  // Función para manejar el cambio en los campos del formulario
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setSection((prev) => ({ ...prev, [name]: value }));
+    setSection(prev => ({ ...prev, [name]: value }));
+    if (name === 'sectionName') {
+      onSectionNameChange(value);
+    }
   };
 
-  // Función para manejar la presentación del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!businessId) return; // Verificar que el businessId está presente
+    if (!businessId) return;
 
     try {
       const response = await axios.post('/api/menu-sections', {
         ...section,
         businessId: businessId,
       });
-
       console.log(response.data);
-      setSection({ sectionName: '', description: '' }); // Resetear el formulario
+      setSection({ sectionName: '', description: '' });
     } catch (error) {
       console.error('Error al agregar la sección del menú', error);
     }
   };
 
-  // Obtener la información del negocio cuando el componente se monta
   useEffect(() => {
     const fetchBusinessInfo = async () => {
-      try {
-        if (businessId) {
+      if (businessId) {
+        try {
           const response = await axios.get(`/api/getBusinessInfo?businessId=${businessId}`);
           setBusinessInfo(response.data);
+        } catch (error) {
+          console.error('Error fetching business info', error);
         }
-      } catch (error) {
-        console.error('Error fetching business info', error);
       }
     };
-
     fetchBusinessInfo();
   }, [businessId]);
 
@@ -96,5 +92,6 @@ const AddSection: React.FC<AddSectionProps> = ({ businessId, businessInfoProp })
     </div>
   );
 };
+
 
 export default AddSection;

@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+// next.config.js
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -6,9 +6,8 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     dangerouslyAllowSVG: true,
   },
-  api: {
-    bodyParser: false,  // Desactiva el análisis automático del cuerpo de la solicitud
-    multipart: true,    // Permite la manipulación de datos de formulario multipart
+  compiler: {
+    styledComponents: true, // Habilita el soporte para styled-components
   },
 }
 

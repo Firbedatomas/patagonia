@@ -6,11 +6,10 @@ export interface BusinessInfo {
   businessName?: string; // Haciendo que la propiedad pueda ser undefined
   logo?: string;
 }
- 
-  
-  // Props para el componente AddSection
-  export interface AddSectionProps {
-    businessId: string | null;
-    businessInfoProp: BusinessInfo | null;
-  }
-  
+
+// Props para el componente AddSection
+export interface AddSectionProps {
+  businessId: string | null;
+  businessInfoProp: BusinessInfo | null;
+  onSectionNameChange: (newSectionName: string) => void; // Agrega esta línea
+}

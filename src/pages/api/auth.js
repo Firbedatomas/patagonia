@@ -6,13 +6,16 @@ const auth = async (req, res) => {
     const { email, password } = req.body;
 
     // Encuentra al usuario por su email
-    const user = await User.findOne({ where: { email } });
+   const user = await User.findOne({ where: { email } });
+    //const user = await User.findOne({ where: { email: 'firbedatomas@icloud.com' } });
 
     // Si no se encuentra el email o la contraseña no coincide, devuelve un error
+    console.log(user.password);
+    console.log(user.email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
+ 
     // Elimina la contraseña hasheada y otros datos sensibles del objeto de respuesta
     const { password: _, role, isActive, multipleBusinesses, languagePreference, timezone, ...safeUser } = user.get();
 

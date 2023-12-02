@@ -1,22 +1,8 @@
+// /Applications/MAMP/htdocs/ta-app/models/User.tsx
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
 
-/**
- * User Model
- * Represents a user in the system.
- */
-class User extends Model {
-  public id!: number;
-  public businessName!: string;
-  public fullName!: string;
-  public phoneNumber!: string;
-  public email!: string;
-  public password!: string;
-  public timezone!: string;
-  public languagePreference!: string;
-  public verificationToken!: string;
-  public verified!: number;  
-}
+class User extends Model {}
 
 User.init(
   {
@@ -72,8 +58,8 @@ User.init(
   {
     sequelize,
     modelName: 'User',
+    // Considera agregar aquí otras configuraciones del modelo si son necesarias
   }
 );
-
 
 export default User;

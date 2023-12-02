@@ -8,7 +8,7 @@ import StepNavigation from './StepNavigation';
 import PhonePreview from './dashboard/PhonePreview';
 import AddSection from './dashboard/AddSection';
 import { Session } from 'next-auth';
-import { BusinessInfo } from '@/types/types'; // Ajusta la ruta según la estructura de tu proyecto
+import { BusinessInfo } from '@/types/types'; 
 
 interface BusinessInfoType {
   businessId?: string;
@@ -38,7 +38,7 @@ export default function Dashboard() {
   ]);
 
   const { data: session } = useSession();
-
+  const [sectionName, setSectionName] = useState('');
   useEffect(() => {
     if (session) {
       setBusinessName(session.user?.businessName?.toLowerCase() || '');
@@ -92,7 +92,10 @@ export default function Dashboard() {
     logo: businessInfo.logo || '',
     // Asegúrate de incluir aquí todas las propiedades adicionales requeridas por BusinessInfo
   } : null;
-
+  // Función para manejar el cambio en el nombre de la sección
+  const handleSectionNameChange = (newSectionName: string) => {
+    setSectionName(newSectionName);
+  };
   return (
     <div className="bg-gray-100 min-h-screen">
       <header className="bg-white shadow">
@@ -116,10 +119,11 @@ export default function Dashboard() {
                 />
               )}
                 {currentStep === '02' && businessInfoConverted && (
-                  <AddSection
-                    businessId={businessInfoConverted.businessId.toString()}
-                    businessInfoProp={businessInfoConverted}
-                  />
+                <AddSection
+                businessId={businessInfoConverted.businessId.toString()}
+                businessInfoProp={businessInfoConverted}
+                onSectionNameChange={handleSectionNameChange} // Asegúrate de pasar esta prop
+              />
                 )}
 
 
@@ -127,11 +131,12 @@ export default function Dashboard() {
             </div>
             <div className="md:col-span-1 relative space-y-8">
             <PhonePreview 
-  businessName={businessInfo?.businessName || businessName} 
-  logo={selectedImageUrl || businessInfo?.logo}
-  businessInfo={businessInfo}
-  currentStep={currentStep} // Asegúrate de pasar el paso actual aquí
-/>
+                businessName={businessInfo?.businessName || businessName} 
+                logo={selectedImageUrl || businessInfo?.logo}
+                businessInfo={businessInfo}
+                currentStep={currentStep}
+                sectionName={sectionName} // Pasar el nombre de la sección
+              />
             </div>
           </div>
         </div>

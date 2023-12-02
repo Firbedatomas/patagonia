@@ -10,6 +10,7 @@ export interface PhonePreviewProps {
   dbLogoUrl?: string | null;
   businessInfo?: BusinessInfoType | null;
   currentStep: string;
+  sectionName: string; 
 }
 
 const PhonePreview: FC<PhonePreviewProps> = ({
@@ -19,9 +20,9 @@ const PhonePreview: FC<PhonePreviewProps> = ({
   dbLogoUrl,
   businessInfo,
   currentStep,
+  sectionName, // Usa directamente esta prop
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [sectionName, setSectionName] = useState<string>(''); // Estado para almacenar el valor del input
   const logoToDisplay = logo ?? businessInfo?.logo ?? dbLogoUrl ?? null;
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const PhonePreview: FC<PhonePreviewProps> = ({
                   <div class="text-center flex flex-col items-center">
                     <div style="position: relative; width: 100%; minHeight: 35px;">
                       <p class="text-black font-bold text-sm mb-2">@${businessName}</p>
-                      <p class="text-black font-bold text-sm mb-2">{sectionName}</p> 
+                      <p className="text-black font-bold text-sm mb-2">{sectionName}</p>
                     </div>
                   </div>
                 </main>
