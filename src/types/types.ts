@@ -2,6 +2,8 @@
 
 // Interfaz para la información de un negocio
 export interface BusinessInfo {
+  sectionName: string;
+  sectionId: string;
   businessId: number;
   businessName?: string; // Haciendo que la propiedad pueda ser undefined
   logo?: string;

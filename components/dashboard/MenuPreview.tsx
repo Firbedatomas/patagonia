@@ -6,7 +6,8 @@ interface MenuPreviewProps {
 }
 
 export async function getMenuPreviewContent(imageSrc?: string | null, businessName?: string, serverImageSrc?: string | null): Promise<string> {
-    const safeBusinessName = businessName ? generateSafeBusinessName(businessName) : '';
+  
+  const safeBusinessName = businessName ? generateSafeBusinessName(businessName) : '';
     const qrCodeUrl = businessName ? await generateQRCodeAsDataURL(businessName) : '';
     const logoToUse = serverImageSrc || imageSrc;
 

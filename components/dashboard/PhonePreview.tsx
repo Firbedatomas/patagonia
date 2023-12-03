@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
-import { getMenuPreviewContent } from './MenuPreview';
 import CommonHeader from './CommonHeader';
-import { BusinessInfoType } from './BusinessType'; // Asegúrate de que la ruta sea correcta
+import { BusinessInfoType } from './BusinessType';
+import { getMenuPreviewContent } from './MenuPreview';
 
 export interface PhonePreviewProps {
   imageSrc?: string | null;
@@ -10,7 +10,7 @@ export interface PhonePreviewProps {
   dbLogoUrl?: string | null;
   businessInfo?: BusinessInfoType | null;
   currentStep: string;
-  sectionName: string; 
+  sectionName: string; // Esto será un array en el futuro
 }
 
 const PhonePreview: FC<PhonePreviewProps> = ({
@@ -20,65 +20,64 @@ const PhonePreview: FC<PhonePreviewProps> = ({
   dbLogoUrl,
   businessInfo,
   currentStep,
-  sectionName, // Usa directamente esta prop
+  sectionName,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const logoToDisplay = logo ?? businessInfo?.logo ?? dbLogoUrl ?? null;
 
+  const [hasContent, setHasContent] = useState(false);
+
   useEffect(() => {
     const updateIframeContent = async () => {
-      if (iframeRef.current) {
-        try {
-          let content = '';
-
-          if (currentStep === '01') {
-            // Muestra el contenido completo (incluyendo QR y nombre de la empresa) en el paso 1
-            content = await getMenuPreviewContent(imageSrc, businessName, logoToDisplay);
-          } else {
-            // Muestra solo el logo de la empresa y el nombre de la sección en otros pasos
-            content = `
-              <html>
+      if (iframeRef.current && sectionName.trim() !== '') {
+        let content = '';
+        if (currentStep === '01') {
+          content = await getMenuPreviewContent(imageSrc, businessName, logoToDisplay);
+        } else {
+          content = `
+            <html>
               <head>
                 <link href="/tailwind.css" rel="stylesheet">
               </head>
-              <body style="display: flex; flex-direction: column; height: 100vh; justify-content: flex-start;">
-                <main class="shadow-md rounded-md p-4 flex flex-col items-center justify-center mt-auto">
-                  <div class="text-center flex flex-col items-center">
-                    <div style="position: relative; width: 100%; minHeight: 35px;">
-                      <p class="text-black font-bold text-sm mb-2">@${businessName}</p>
-                      <p className="text-black font-bold text-sm mb-2">{sectionName}</p>
+              <body class="bg-gray-100">
+                <div class="container mx-auto p-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-3 text-center flex justify-center items-center rounded-lg shadow-lg ${
+                      hasContent ? 'animate-fadeIn' : ''
+                    }">
+                      <p class="text-black font-light text-sm">${sectionName}</p>
                     </div>
                   </div>
-                </main>
+                </div>
               </body>
-              </html>
-            `;
-          }
+            </html>
+          `;
+        }
 
-          const { contentWindow } = iframeRef.current;
+        const contentDocument = iframeRef.current.contentDocument;
+        if (contentDocument) {
+          contentDocument.open();
+          contentDocument.write(content);
+          contentDocument.close();
+        }
 
-          if (contentWindow) {
-            contentWindow.document.open();
-            contentWindow.document.write(content);
-            contentWindow.document.close();
-          } else {
-            console.error('Error updating iframe content: contentWindow is null');
-          }
-        } catch (error) {
-          console.error('Error updating iframe content:', error);
+        if (sectionName.trim() !== '') {
+          setHasContent(true);
+        } else {
+          setHasContent(false);
         }
       }
     };
 
     updateIframeContent();
-  }, [imageSrc, businessName, logoToDisplay, currentStep, sectionName]);
+  }, [imageSrc, businessName, logoToDisplay, currentStep, sectionName, hasContent]);
 
   return (
     <div id="React--Preview" className="preview-wrap">
-      <CommonHeader logoToUse={logoToDisplay} />
-      <iframe ref={iframeRef} style={{ border: 'none', width: '100%', height: '100%' }} title="Phone Preview"></iframe>
+      <CommonHeader logoToUse={logoToDisplay} businessName={businessName || 'Nombre de negocio no disponible'} />
+      <iframe ref={iframeRef} style={{ border: 'none', width: '100%', height: '100%' }} title="Phone Preview" />
     </div>
   );
 };
 
-export default PhonePreview;
+export default React.memo(PhonePreview);

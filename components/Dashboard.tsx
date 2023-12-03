@@ -8,7 +8,8 @@ import StepNavigation from './StepNavigation';
 import PhonePreview from './dashboard/PhonePreview';
 import AddSection from './dashboard/AddSection';
 import { Session } from 'next-auth';
-import { BusinessInfo } from '@/types/types'; 
+import { BusinessInfo } from '@/types/types';
+import AddProduct from './dashboard/AddProduct';
 
 interface BusinessInfoType {
   businessId?: string;
@@ -17,13 +18,10 @@ interface BusinessInfoType {
   logo?: string;
 }
 
-// Asegúrate de que la interfaz AddSectionProps incluya currentStep
-interface AddSectionProps {
-  businessId: string;
-  businessInfoProp: BusinessInfo;
-  currentStep: string; // Agrega esta propiedad
+interface CurrentSectionType {
+  sectionId: number;
+  sectionName: string;
 }
-
 
 export default function Dashboard() {
   const [currentStep, setCurrentStep] = useState('01');
@@ -36,42 +34,68 @@ export default function Dashboard() {
     { id: '02', name: 'Secciones del menú', description: 'Carga las secciones de tus productos.', href: '#', status: 'upcoming' },
     { id: '03', name: 'Productos', description: 'Carguemos tus primeros productos.', href: '#', status: 'upcoming' },
   ]);
-
+  const [currentSection, setCurrentSection] = useState<CurrentSectionType | null>(null);
   const { data: session } = useSession();
   const [sectionName, setSectionName] = useState('');
+  const [loading, setLoading] = useState(false); // Agregamos estado para el feedback al usuario
+
   useEffect(() => {
-    if (session) {
+    const fetchData = async () => {
+      if (!session) return;
+
       setBusinessName(session.user?.businessName?.toLowerCase() || '');
-      const fetchBusiness = async () => {
-        try {
-          const userId = session.user?.id;
-          const res = await fetch(`/api/getBusinessByUserId?userId=${userId}`);
-          const data = await res.json();
 
-          if (res.ok && data.businessId) {
-            setBusinessInfo(data);
-            setCurrentStep('02'); // Cambia a '02' cuando el negocio existe
-            updateStepStatus('02');
-            setIsGoogleMapLoaded(false);
-          } else {
-            setCurrentStep('01');
-            updateStepStatus('01');
-            setIsGoogleMapLoaded(true);
-          }
-        } catch (error) {
-          console.error('Error fetching business:', error);
+      try {
+        // Obtener información del negocio
+        const resBusiness = await fetch(`/api/getBusinessByUserId?userId=${session.user?.id}`);
+        const dataBusiness = await resBusiness.json();
+
+        if (resBusiness.ok && dataBusiness && dataBusiness.businessId) {
+          setBusinessInfo(dataBusiness);
+          setCurrentStep('02');
+          updateStepStatus('02');
+          setIsGoogleMapLoaded(false);
+        } else {
+          setCurrentStep('01');
+          updateStepStatus('01');
+          setIsGoogleMapLoaded(true);
+          setLoading(false);
+          return; // Detener la ejecución si no se obtiene información del negocio
         }
-      };
 
-      fetchBusiness();
-    }
+        // Verificar secciones
+        const resSections = await fetch(`/api/menu-sections?businessId=${dataBusiness.businessId}`);
+        const sectionsData = await resSections.json();
+        if (resSections.ok && sectionsData.length > 0) {
+          setCurrentStep('03');
+          updateStepStatus('03');
+        }
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+        setLoading(false);
+        // Manejar errores de red, errores en la API, etc.
+        // Puedes mostrar un mensaje de error al usuario o realizar otras acciones apropiadas.
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+    fetchData();
   }, [session]);
 
   const updateStepStatus = useCallback((newCurrentStep: string) => {
-    setSteps(prevSteps => prevSteps.map(step => ({
-      ...step,
-      status: step.id === newCurrentStep ? 'current' : parseInt(step.id) < parseInt(newCurrentStep) ? 'complete' : 'upcoming'
-    })));
+    setSteps((prevSteps) =>
+      prevSteps.map((step) => ({
+        ...step,
+        status:
+          step.id === newCurrentStep
+            ? 'current'
+            : parseInt(step.id) < parseInt(newCurrentStep)
+            ? 'complete'
+            : 'upcoming',
+      }))
+    );
   }, []);
 
   const handleFileUpload = useCallback((file: File | null) => {
@@ -83,19 +107,30 @@ export default function Dashboard() {
   const isUserVerified = isVerified(session);
 
   const handleHeaderImageChange = useCallback((newHeaderImage: string | null) => {
-    setBusinessInfo(previous => ({ ...previous, logo: newHeaderImage || undefined }));
+    setBusinessInfo((previous) => ({ ...previous, logo: newHeaderImage || undefined }));
   }, []);
 
-  const businessInfoConverted: BusinessInfo | null = businessInfo && businessInfo.businessId ? {
-    businessId: parseInt(businessInfo.businessId) || 0,
-    businessName: businessInfo.businessName || '',
-    logo: businessInfo.logo || '',
-    // Asegúrate de incluir aquí todas las propiedades adicionales requeridas por BusinessInfo
-  } : null;
-  // Función para manejar el cambio en el nombre de la sección
+  const businessInfoConverted: BusinessInfo | null =
+    businessInfo && businessInfo.businessId
+      ? {
+          businessId: parseInt(businessInfo.businessId) || 0,
+          businessName: businessInfo.businessName || '',
+          logo: businessInfo.logo || '',
+          sectionName: '',
+          sectionId: '',
+        }
+      : null;
+
   const handleSectionNameChange = (newSectionName: string) => {
     setSectionName(newSectionName);
   };
+
+  const handleSectionCreated = (sectionData: CurrentSectionType) => {
+    setCurrentSection(sectionData);
+    setCurrentStep('03');
+    updateStepStatus('03');
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <header className="bg-white shadow">
@@ -114,29 +149,35 @@ export default function Dashboard() {
                   onHeaderImageChange={handleHeaderImageChange}
                   setCurrentStep={setCurrentStep}
                   updateStepStatus={updateStepStatus}
-                  isGoogleMapLoaded={isGoogleMapLoaded} 
+                  isGoogleMapLoaded={isGoogleMapLoaded}
                   handleFileUpload={handleFileUpload}
                 />
               )}
-                {currentStep === '02' && businessInfoConverted && (
+              {currentStep === '02' && businessInfoConverted && (
                 <AddSection
-                businessId={businessInfoConverted.businessId.toString()}
-                businessInfoProp={businessInfoConverted}
-                onSectionNameChange={handleSectionNameChange} // Asegúrate de pasar esta prop
-              />
-                )}
-
-
-          
+                  businessId={businessInfoConverted?.businessId.toString() || ''}
+                  businessInfoProp={businessInfoConverted}
+                  onSectionNameChange={handleSectionNameChange}
+                  onSectionCreated={handleSectionCreated}
+                  currentStep={''}
+                />
+              )}
+              {currentStep === '03' && currentSection && (
+                <AddProduct sectionId={currentSection.sectionId.toString()} sectionName={currentSection.sectionName} />
+              )}
             </div>
             <div className="md:col-span-1 relative space-y-8">
-            <PhonePreview 
-                businessName={businessInfo?.businessName || businessName} 
-                logo={selectedImageUrl || businessInfo?.logo}
-                businessInfo={businessInfo}
-                currentStep={currentStep}
-                sectionName={sectionName} // Pasar el nombre de la sección
-              />
+              {loading ? (
+                <LoadingSpinner /> // Feedback visual durante la carga de datos
+              ) : (
+                <PhonePreview
+                  businessName={businessInfo?.businessName || businessName}
+                  logo={selectedImageUrl || businessInfo?.logo}
+                  businessInfo={businessInfo}
+                  currentStep={currentStep}
+                  sectionName={sectionName}
+                />
+              )}
             </div>
           </div>
         </div>

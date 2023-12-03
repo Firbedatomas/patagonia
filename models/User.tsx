@@ -2,7 +2,23 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
 
-class User extends Model {}
+export interface IUser {
+  id: number;
+  businessName: string;
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  timezone: string;
+  languagePreference: string;
+  verificationToken?: string;
+  verified?: number;
+  // Añadir aquí cualquier otra propiedad que tu modelo User pueda tener
+}
+
+class User extends Model {
+  id: any;
+}
 
 User.init(
   {
